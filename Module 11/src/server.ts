@@ -2,36 +2,9 @@ import http, { IncomingMessage, Server, ServerResponse } from 'http'
 import config from './config';
 import { RouteHandler, routes } from './helpers/RouteHandler';
 import './routes'
-
-function findDynamicRoute(method: string, url: string) {
-    const methodMap = routes.get(method)
-    if (!methodMap) return null;
-
-    for (const [routePath, handler] of methodMap.entries()) {
-        const routeParts = routePath.split('/')
-        const urlParts = url.split('/')
-
-        if (routeParts.length !== urlParts.length) continue;
+import findDynamicRoute from './helpers/dynamicRouteHandler';
 
 
-        const params: any = {}
-        let matched = true;
-
-        // '/api/users/:id'
-        for (let i = 0; i < routeParts.length; i++) {
-            if (routeParts[i]?.startsWith(':')) {
-                params[routeParts[i]?.substring(1)!] = urlParts[i]
-            } else if (routeParts[i] !== urlParts[i]) {
-                matched = false;
-                break;
-            }
-        }
-        if (matched) {
-            return { handler, params }
-        }
-    }
-    return null
-}
 const server: Server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     {
         console.log('server is running...');
